@@ -88,4 +88,13 @@ class UserController extends Controller
         ]);
 	}
 	
+	public function destroy($id)
+	{
+		DB::table('tb_users')->where('id',$id)->delete();
+		return response()->json([
+	            'status'=> 204,
+	            'message'=> 'Deleted record',
+        	]);
+	}
+	
 }
