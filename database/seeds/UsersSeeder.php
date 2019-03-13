@@ -20,7 +20,7 @@ class UsersSeeder extends Seeder
                 'name' => $faker->name,
                 'email' => $faker->unique()->email,
                 'gender'=> $faker->randomElement(['male', 'female']),
-                'password'=> bcrypt('123'),
+                'password'=> md5('123'),
                 'description'=>$faker->word,
                 'image'=>$faker->imageUrl($width = 640, $height = 480),
             ]);
