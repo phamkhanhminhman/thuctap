@@ -87,7 +87,6 @@ class UserController extends Controller
             'message'=> 'Created account successfully',
         ]);
 	}
-	
 	public function destroy($id)
 	{
 		DB::table('tb_users')->where('id',$id)->delete();
@@ -96,5 +95,22 @@ class UserController extends Controller
 	            'message'=> 'Deleted record',
         	]);
 	}
-	
+	public function listUser()
+	{
+		$data= DB::table('tb_users')->select('*')->get();
+		return response()->json([
+			'status'=> 200,
+			'message'=>'List User',
+			'data'=>$data,
+		]);
+	}
+	public function detailUser($id)
+	{
+		$data= DB::table('tb_users')->select('*')->where('id',$id)->get();
+		return response()->json([
+			'status'=> 200,
+			'message'=>'Detail User',
+			'data'=>$data,
+		]);
+	}
 }
