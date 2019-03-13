@@ -24,3 +24,4 @@ Route::put('/users/{id}', 'UserController@update');
 Route::delete('/users/{id}', 'UserController@destroy');
 Route::get('/users', 'UserController@listUser');
 Route::get('/users/{id}', 'UserController@detailUser');
+Route::post('/import', 'UserController@importExcel');

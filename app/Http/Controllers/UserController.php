@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use DB;
+use Excel;
 use Illuminate\Support\Facades\URL;
-
+use App\Imports\UsersImport;
 class UserController extends Controller
 {
 	public function checkLogin(Request $request)
@@ -66,12 +67,12 @@ class UserController extends Controller
 		$file= $request->file('image');
 		if ($request->hasFile('image'))
 		{
-				$type_img=$file->getClientOriginalExtension();
-				if ($type_img=='jpg' || $type_img=='png')
-				{
-					$img= "upload/".$file->getClientOriginalName();
-        			$file->move('./upload/',$file->getClientOriginalName());
-				}			
+			$type_img=$file->getClientOriginalExtension();
+			if ($type_img=='jpg' || $type_img=='png')
+			{
+				$img= "upload/".$file->getClientOriginalName();
+    			$file->move('./upload/',$file->getClientOriginalName());
+			}			
 		}     
 		DB::table('tb_users')->insert(
 			[
@@ -86,6 +87,22 @@ class UserController extends Controller
             'status'=> 201,
             'message'=> 'Created account successfully',
         ]);
+	}
+	public function update(Request $request, $id)
+	{
+		$name= $request->name;
+		$gender=$request->gender;
+		$description= $request->description; 
+		DB::table('tb_users')->where('id',$id)->update(
+			[
+				'name'=>$name,
+				'gender'=>$gender,
+				'description'=>$description,
+			]);
+		return response()->json([
+	            'message'=> 'Updated',
+	            'data'=> $name,
+        	]);
 	}
 	public function destroy($id)
 	{
