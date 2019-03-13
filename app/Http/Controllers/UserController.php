@@ -47,5 +47,45 @@ class UserController extends Controller
 	            'message'=> 'Logout success',
         	]);
 	}
+	public function store(Request $request)
+	{
+		$this->validate($request, 
+			[
+				'name'=>'required|string',
+				'gender'=>'required|string',
+				'email'=>'required|email|unique:tb_users',
+			 	'password'=>'required',
+			 	'image'=>'required'
+		    ]);
+		$name= $request->name;
+		$gender=$request->gender;
+		$email= $request->email;
+		$description= $request->description;
+		$password= $request->password;
+		$password= md5($password);
+		$file= $request->file('image');
+		if ($request->hasFile('image'))
+		{
+				$type_img=$file->getClientOriginalExtension();
+				if ($type_img=='jpg' || $type_img=='png')
+				{
+					$img= "upload/".$file->getClientOriginalName();
+        			$file->move('./upload/',$file->getClientOriginalName());
+				}			
+		}     
+		DB::table('tb_users')->insert(
+			[
+				'name'=>$name,
+				'gender'=>$gender,
+				'email'=>$email,
+				'password'=>$password,
+				'description'=>$description,
+				'image'=>$img,
+			]);
+		return response()->json([
+            'status'=> 201,
+            'message'=> 'Created account successfully',
+        ]);
+	}
 	
 }
