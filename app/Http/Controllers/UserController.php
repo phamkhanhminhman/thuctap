@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use DB;
-use Excel;
-use Illuminate\Support\Facades\URL;
 use App\Imports\UsersImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\URL;
 class UserController extends Controller
 {
 	public function checkLogin(Request $request)
@@ -128,6 +128,14 @@ class UserController extends Controller
 			'status'=> 200,
 			'message'=>'Detail User',
 			'data'=>$data,
+		]);
+	}
+	public function importExcel()
+	{
+		Excel::import(new UsersImport, request()->file('excel'));
+		return response()->json([
+			'status'=> 200,
+			'message'=>'Import excel successfully',
 		]);
 	}
 }
