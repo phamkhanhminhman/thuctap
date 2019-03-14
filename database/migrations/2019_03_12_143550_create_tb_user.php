@@ -21,7 +21,7 @@ class CreateTbUser extends Migration
             $table->string('password');
             $table->string('image')->nullable();
             $table->text('description')->nullable();
-            $table->timestamps();
+            $table->timestamps('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));;
         });
     }
 

@@ -10,7 +10,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\URL;
 class UserController extends Controller
 {
-	public function checkLogin(Request $request)
+	public function login(Request $request)
 	{
 		$this->validate($request, 
 			[
@@ -40,13 +40,24 @@ class UserController extends Controller
         	]);
 		}
 	}
-	public function logout($id)
+	public function logout(Request $request)
 	{
-		DB::table('tb_users')->where('id',$id)->update(['api_token'=>null]);
-		return response()->json([
+		$data= DB::table('tb_users')->where('api_token',$request->header('token'))->get();
+		if (count($data)==1){
+			DB::table('tb_users')->where('api_token',$request->header('token'))->update(['api_token'=>null]);
+			return response()->json([
 	            'status'=> 200,
 	            'message'=> 'Logout success',
         	]);
+		}
+		else
+		{
+			return response()->json([
+	            'status'=> 200,
+	            'message'=> 'nothing',
+        	]);
+		}
+		
 	}
 	public function store(Request $request)
 	{
@@ -112,30 +123,53 @@ class UserController extends Controller
 	            'message'=> 'Deleted record',
         	]);
 	}
-	public function listUser()
+	public function listUser(Request $request)
 	{
-		$data= DB::table('tb_users')->select('*')->get();
-		return response()->json([
-			'status'=> 200,
-			'message'=>'List User',
-			'data'=>$data,
-		]);
+		$data= DB::table('tb_users')->where('api_token',$request->header('token'))->get();
+		if(count($data)==1)
+		{
+			$data= DB::table('tb_users')->select('*')->get();
+			return response()->json([
+				'status'=> 200,
+				'message'=>'List User',
+				'data'=>$data,
+			]);
+		}
+		
 	}
-	public function detailUser($id)
+	public function detailUser(Request $request, $id)
 	{
-		$data= DB::table('tb_users')->select('*')->where('id',$id)->get();
-		return response()->json([
-			'status'=> 200,
-			'message'=>'Detail User',
-			'data'=>$data,
-		]);
+		$data= DB::table('tb_users')->where('api_token',$request->header('token'))->get();
+		if (count($data)==1)
+		{
+			$data= DB::table('tb_users')->select('*')->where('id',$id)->get();
+			return response()->json([
+				'status'=> 200,
+				'message'=>'Detail User',
+				'data'=>$data,
+			]);
+		}
+		
 	}
-	public function importExcel()
+	public function importExcel(Request $request)
 	{
-		Excel::import(new UsersImport, request()->file('excel'));
-		return response()->json([
-			'status'=> 200,
-			'message'=>'Import excel successfully',
-		]);
+		$token = $request->header('token');
+		$data= DB::table('tb_users')->where('api_token',$token)->get();
+		if (count($data)==1)
+		{
+			Excel::import(new UsersImport, request()->file('excel'));
+			return response()->json([
+				'status'=> 200,
+				'message'=>'Imported',
+			]);
+		}
+		else
+		{
+			return response()->json([
+				'status'=> 200,
+				'message'=>'nothing',
+			]);
+		}
+		
 	}
 }

@@ -17,11 +17,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/check-login', 'UserController@checkLogin');
-Route::post('/users/{id}', 'UserController@logout');
+Route::post('/login', 'UserController@login')->middleware('MyMiddle');
+Route::post('/logout', 'UserController@logout');
 Route::post('/users', 'UserController@store');
 Route::put('/users/{id}', 'UserController@update');
 Route::delete('/users/{id}', 'UserController@destroy');
 Route::get('/users', 'UserController@listUser');
 Route::get('/users/{id}', 'UserController@detailUser');
-Route::post('/import', 'UserController@importExcel');
+Route::post('/import', 'UserController@importExcel')->middleware('CheckToken');
