@@ -16,7 +16,7 @@ class CreateTbUser extends Migration
         Schema::create('tb_users', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
-            $table->string('gender')->nullable();
+            $table->boolean('gender')->nullable();
             $table->string('email')->unique();
             $table->string('password');
             $table->string('image')->nullable();
