@@ -1,7 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-
+	
+//Access-Control-Allow-Origin header with wildcard.
+header('Access-Control-Allow-Origin: *');
+header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use DB;
@@ -121,7 +124,7 @@ class UserController extends Controller
 			{
 				if ($request->has('image'))
 				{
-					$img= "C:/xampp/htdocs/baitap/public/upload/".$file->getClientOriginalName();
+					$img= "http://127.0.0.1:8000/upload/".$file->getClientOriginalName();
 					$file->move('./upload/',$file->getClientOriginalName());
 					DB::table('tb_users')->insert(
 						[
