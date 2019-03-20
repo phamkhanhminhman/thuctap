@@ -381,4 +381,44 @@ class UserController extends Controller
 			]);
 		}	
 	}
+	public function changePassword(Request $request)
+	{	
+		$old_pass= $request->old_pass;
+		$new_pass= $request->new_pass;
+		$token= $request->header('token');
+		$data= DB::table('tb_users')->where('api_token',$token)->get();
+		if (count($data)==1) 
+		{	
+			foreach ($data as $key) 
+			{
+				$password=$key->password;
+			}
+			if (md5($old_pass)==$password)
+			{
+				DB::table('tb_users')->where('api_token',$token)->update(
+						[
+							'password'=>md5($new_pass),
+						]);
+				return response()->json([
+					'status' => 200,
+					'message'=>'Change password successfully',
+					'data' => $new_pass,
+				]);
+			}
+			else
+			{
+				return response()->json([
+					'status' => 404,
+					'message'=>'Mật khẩu cũ không chính xác',
+				]);
+			}
+		}
+		else
+		{
+			return response()->json([
+				'status' => 404,
+				'message'=>'Must be login',
+			]);
+		}
+	}
 }
