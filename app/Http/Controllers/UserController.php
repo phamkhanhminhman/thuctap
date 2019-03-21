@@ -226,7 +226,7 @@ class UserController extends Controller
 				{
 					$description=$description_old;
 				}
-				if ($token==$token_old)
+				if ($token)
 				{
 				//$img= "C:/xampp/htdocs/baitap/public/upload/".$file->getClientOriginalName();
 					DB::table('tb_users')->where('id',$id)->update(
