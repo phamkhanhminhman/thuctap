@@ -92,7 +92,7 @@ class UserController extends Controller
 				'name' => 'required|min:3|max:20 ',
 				'gender'=>'required|Boolean',
 				'description'=>'max:255 ký tự',
-				'image'=>'image|max:1024',
+				'image'=>'image',
 			],
 			[
 				'required' => ':attribute không được để trống',
@@ -352,9 +352,11 @@ class UserController extends Controller
 				if ($type_file=='xlsx' || $type_file=='csv')
 				{
 					Excel::import(new UsersImport, request()->file('excel'));
+					$data_new = DB::table('tb_users')->select('*')->get();
 					return response()->json([
 						'status' => 200,
 						'message'=>'Imported file excel successfully',
+						'data' => $data_new,
 					]);
 				}
 				else
