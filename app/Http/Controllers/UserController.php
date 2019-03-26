@@ -171,7 +171,7 @@ class UserController extends Controller
 			$request->all(),
 			[
 				'password' => 'min:3|max:20',
-				'name' => 'min:3|max:20',
+				'name' => 'max:20',
 				'gender'=>'Boolean',
 				'image'=>'image',
 				'description'=>'max:255',
@@ -293,8 +293,10 @@ class UserController extends Controller
 	{
 		$data= DB::table('tb_users')->where('api_token',$request->header('token'))->get();
 		if (count($data)==1)
-		{
-			$data= DB::table('tb_users')->select('id','name','gender','email','image','description','created_at','updated_at')->get();
+		{	
+			$query = $_GET['query'];
+			$data= DB::table('tb_users')->select('id','name','gender','email','image','description','created_at','updated_at')
+										->where('name', 'LIKE', "%{$query}%")->orWhere('email', 'LIKE', "%{$query}%")->get();
 			return response()->json([
 				'status'=> 200,
 				'message'=>'Dữ liệu trả về thành công',
@@ -309,27 +311,27 @@ class UserController extends Controller
 			]);
 		}		
 	}
-	public function search(Request $request)
-	{
-		$data= DB::table('tb_users')->where('api_token',$request->header('token'))->get();
-		if (count($data)==1)
-		{
-			$query = $request->searchText;
-			$data = DB::table('tb_users')->select('*')->where('name', 'LIKE', "%{$query}%")->orWhere('email', 'LIKE', "%{$query}%")->get();
-			return response()->json([
-				'status'=>200,
-				'message'=>'Kết quả tìm kiếm',
-				'data' =>$data,
-			]);
-		}
-		else
-		{
-			return response()->json([
-				'status'=> 204,
-				'message'=> 'Must be login',
-			]);
-		}
-	}
+	// public function search(Request $request)
+	// {
+	// 	$data= DB::table('tb_users')->where('api_token',$request->header('token'))->get();
+	// 	if (count($data)==1)
+	// 	{
+	// 		$query = $request->searchText;
+	// 		$data = DB::table('tb_users')->select('*')->where('name', 'LIKE', "%{$query}%")->orWhere('email', 'LIKE', "%{$query}%")->get();
+	// 		return response()->json([
+	// 			'status'=>200,
+	// 			'message'=>'Kết quả tìm kiếm',
+	// 			'data' =>$data,
+	// 		]);
+	// 	}
+	// 	else
+	// 	{
+	// 		return response()->json([
+	// 			'status'=> 204,
+	// 			'message'=> 'Must be login',
+	// 		]);
+	// 	}
+	// }
 	public function detailUser(Request $request, $id)
 	{
 		$data= DB::table('tb_users')->where('api_token',$request->header('token'))->get();
