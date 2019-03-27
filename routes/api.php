@@ -23,7 +23,7 @@ Route::post('/users', 'UserController@store');
 Route::put('/users/{id}', 'UserController@update');
 Route::delete('/users/{id}', 'UserController@destroy');
 Route::get('/users', 'UserController@listUser');
-Route::get('/users?query={query}&page={page}&pageSize={pageSize}', 'UserController@listUser');
+Route::get('/users?query={query}&page={page}&pageSize={pageSize}&sort={sort}', 'UserController@listUser');
 Route::get('/users/{id}', 'UserController@detailUser');
 Route::post('/search', 'UserController@search');
 Route::post('/import', 'UserController@importExcel');	

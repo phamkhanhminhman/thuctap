@@ -305,6 +305,7 @@ class UserController extends Controller
 			$total_user = count($all_user);
 			$page = $_GET['page'];
 			$page_size = $_GET['pageSize'];
+			$sort = $_GET['sort'];
 			if ($page_size == "")
 			{	
 				$page_size=$total_user;
@@ -314,12 +315,26 @@ class UserController extends Controller
 			{
 				$page = 1;
 			}
+
 			$start_index = ($page - 1) * $page_size;
+			$end_index = $start_index + $page_size - 1; 
 			$query = $_GET['query'];
-			$data= DB::table('tb_users')->select('id','name','gender','email','image','description','groupID','created_at','updated_at')
-										->limit($page_size)
-										->offset($start_index)
-										->where('name', 'LIKE', "%{$query}%")->orWhere('email', 'LIKE', "%{$query}%")->get()->toArray();
+			if ($sort == null) 
+			{
+				$data = DB::table('tb_users')->select('*')->where('name', 'LIKE', "%{$query}%")->orWhere('email', 'LIKE', "%{$query}%")->get()->toArray();
+			}
+			else
+			{
+				$data = DB::table('tb_users')->select('*')
+											 ->where('name', 'LIKE', "%{$query}%")
+											 ->orWhere('email', 'LIKE', "%{$query}%")->orderBy('groupID', $sort)->get()->toArray();
+			}
+
+			// $data= DB::table('tb_users')->select('id','name','gender','email','image','description','groupID','created_at','updated_at')
+			// 							->limit($page_size)
+			// 							->offset($start_index)
+			// 							->where('name', 'LIKE', "%{$query}%")->orWhere('email', 'LIKE', "%{$query}%")->get()->toArray();
+			 $data = array_slice($data, $start_index , $page_size);
 			//dd(array_slice($data, 1));
 			return response()->json([
 				'status'=> 200,
