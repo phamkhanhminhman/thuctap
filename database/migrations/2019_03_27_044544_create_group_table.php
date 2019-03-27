@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTbUser extends Migration
+class CreateGroupTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,9 @@ class CreateTbUser extends Migration
      */
     public function up()
     {
-        Schema::create('tb_users', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('groupID');
+        Schema::create('group', function (Blueprint $table) {
+            $table->bigIncrements('groupID');
             $table->string('name');
-            $table->boolean('gender')->nullable();
-            $table->string('email')->unique();
-            $table->string('password');
-            $table->string('image')->nullable();
-            $table->text('description')->nullable();
             $table->timestamps('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
         });
     }
@@ -33,6 +27,6 @@ class CreateTbUser extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tb_user');
+        Schema::dropIfExists('group');
     }
 }

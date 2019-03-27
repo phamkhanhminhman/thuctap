@@ -172,7 +172,7 @@ class UserController extends Controller
 			[
 				'password' => 'min:3|max:20',
 				'name' => 'max:20',
-				'gender'=>'Boolean',
+				'gender'=>'',
 				'image'=>'image',
 				'description'=>'max:255',
 			],
@@ -195,6 +195,7 @@ class UserController extends Controller
 			$token=$request->header('token');
 			$name= $request->name;
 			$gender=$request->gender;
+			$groupID=$request->groupID;
 			$password=$request->password;
 			$description= $request->description;
 			$file= $request->file('image'); 
@@ -205,6 +206,7 @@ class UserController extends Controller
 				{
 					$name_old=$key->name;
 					$gender_old=$key->gender;
+					$groupID_old=$key->groupID;
 					$password_old=$key->password;
 					$description_old=$key->description;
 					$image_old=$key->image;
@@ -226,13 +228,18 @@ class UserController extends Controller
 				{
 					$description=$description_old;
 				}
+				if ($groupID==null)
+				{
+					$groupID=$groupID_old;
+				}
 				if ($token)
 				{
-				//$img= "C:/xampp/htdocs/baitap/public/upload/".$file->getClientOriginalName();
+				//$img= "".$file->getClientOriginalName();
 					DB::table('tb_users')->where('id',$id)->update(
 						[
 							'name'=>$name,
 							'gender'=>$gender,
+							'groupID'=>$groupID,
 							'password'=> md5($password),
 							'description'=>$description,
 
@@ -294,13 +301,31 @@ class UserController extends Controller
 		$data= DB::table('tb_users')->where('api_token',$request->header('token'))->get();
 		if (count($data)==1)
 		{	
+			$all_user = DB::table('tb_users')->get();
+			$total_user = count($all_user);
+			$page = $_GET['page'];
+			$page_size = $_GET['pageSize'];
+			if ($page_size == "")
+			{	
+				$page_size=$total_user;
+
+			}
+			if ($page == "")
+			{
+				$page = 1;
+			}
+			$start_index = ($page - 1) * $page_size;
 			$query = $_GET['query'];
-			$data= DB::table('tb_users')->select('id','name','gender','email','image','description','created_at','updated_at')
-										->where('name', 'LIKE', "%{$query}%")->orWhere('email', 'LIKE', "%{$query}%")->get();
+			$data= DB::table('tb_users')->select('id','name','gender','email','image','description','groupID','created_at','updated_at')
+										->limit($page_size)
+										->offset($start_index)
+										->where('name', 'LIKE', "%{$query}%")->orWhere('email', 'LIKE', "%{$query}%")->get()->toArray();
+			//dd(array_slice($data, 1));
 			return response()->json([
 				'status'=> 200,
 				'message'=>'Dữ liệu trả về thành công',
 				'data'=>$data,
+				'length'=>$total_user,
 			]);
 		}
 		else
@@ -337,7 +362,7 @@ class UserController extends Controller
 		$data= DB::table('tb_users')->where('api_token',$request->header('token'))->get();
 		if (count($data)==1)
 		{
-			$data_1= DB::table('tb_users')->select('id','name','gender','email','image','description','created_at','updated_at')->where('id',$id)->get();
+			$data_1= DB::table('tb_users')->select('id','name','groupID','gender','email','image','description','created_at','updated_at')->where('id',$id)->get();
 			if (count($data_1))
 			{
 				return response()->json([
