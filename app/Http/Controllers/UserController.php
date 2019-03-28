@@ -321,7 +321,10 @@ class UserController extends Controller
 			$query = $_GET['query'];
 			if ($sort == null) 
 			{
-				$data = DB::table('tb_users')->leftjoin('tb_group', 'tb_users.groupID', '=' , 'tb_group.groupID')->select('*')->where('name', 'LIKE', "%{$query}%")->orWhere('email', 'LIKE', "%{$query}%")->get()->toArray();
+				$data = DB::table('tb_users')->leftjoin('tb_group', 'tb_users.groupID', '=' , 'tb_group.groupID')
+											 ->select('*')
+											 ->where('name', 'LIKE', "%{$query}%")
+											 ->orWhere('email', 'LIKE', "%{$query}%")->get()->toArray();
 			}
 			else
 			{
@@ -330,11 +333,6 @@ class UserController extends Controller
 											 ->where('name', 'LIKE', "%{$query}%")
 											 ->orWhere('email', 'LIKE', "%{$query}%")->orderBy('tb_users.groupID', $sort)->get()->toArray();
 			}
-
-			// $data= DB::table('tb_users')->select('id','name','gender','email','image','description','groupID','created_at','updated_at')
-			// 							->limit($page_size)
-			// 							->offset($start_index)
-			// 							->where('name', 'LIKE', "%{$query}%")->orWhere('email', 'LIKE', "%{$query}%")->get()->toArray();
 			 $data = array_slice($data, $start_index , $page_size);
 			//dd(array_slice($data, 1));
 			return response()->json([
@@ -352,27 +350,6 @@ class UserController extends Controller
 			]);
 		}		
 	}
-	// public function search(Request $request)
-	// {
-	// 	$data= DB::table('tb_users')->where('api_token',$request->header('token'))->get();
-	// 	if (count($data)==1)
-	// 	{
-	// 		$query = $request->searchText;
-	// 		$data = DB::table('tb_users')->select('*')->where('name', 'LIKE', "%{$query}%")->orWhere('email', 'LIKE', "%{$query}%")->get();
-	// 		return response()->json([
-	// 			'status'=>200,
-	// 			'message'=>'Kết quả tìm kiếm',
-	// 			'data' =>$data,
-	// 		]);
-	// 	}
-	// 	else
-	// 	{
-	// 		return response()->json([
-	// 			'status'=> 204,
-	// 			'message'=> 'Must be login',
-	// 		]);
-	// 	}
-	// }
 	public function detailUser(Request $request, $id)
 	{
 		$data= DB::table('tb_users')->where('api_token',$request->header('token'))->get();
