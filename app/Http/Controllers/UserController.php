@@ -321,13 +321,14 @@ class UserController extends Controller
 			$query = $_GET['query'];
 			if ($sort == null) 
 			{
-				$data = DB::table('tb_users')->select('*')->where('name', 'LIKE', "%{$query}%")->orWhere('email', 'LIKE', "%{$query}%")->get()->toArray();
+				$data = DB::table('tb_users')->leftjoin('tb_group', 'tb_users.groupID', '=' , 'tb_group.groupID')->select('*')->where('name', 'LIKE', "%{$query}%")->orWhere('email', 'LIKE', "%{$query}%")->get()->toArray();
 			}
 			else
 			{
-				$data = DB::table('tb_users')->select('*')
+				$data = DB::table('tb_users')->leftjoin('tb_group', 'tb_users.groupID', '=' , 'tb_group.groupID')
+											 ->select('*')
 											 ->where('name', 'LIKE', "%{$query}%")
-											 ->orWhere('email', 'LIKE', "%{$query}%")->orderBy('groupID', $sort)->get()->toArray();
+											 ->orWhere('email', 'LIKE', "%{$query}%")->orderBy('tb_users.groupID', $sort)->get()->toArray();
 			}
 
 			// $data= DB::table('tb_users')->select('id','name','gender','email','image','description','groupID','created_at','updated_at')
