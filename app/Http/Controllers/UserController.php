@@ -223,10 +223,6 @@ class UserController extends Controller
 				{
 					$gender=$gender_old;
 				}
-				if ($password==null)
-				{
-					$password=$password_old;
-				}
 				if ($description==null)
 				{
 					$description=$description_old;
@@ -243,7 +239,6 @@ class UserController extends Controller
 							'name'=>$name,
 							'gender'=>$gender,
 							'groupID'=>$groupID,
-							'password'=> md5($password),
 							'description'=>$description,
 
 						]);
@@ -344,7 +339,9 @@ class UserController extends Controller
 	}
 	public function detailUser(Request $request, $id)
 	{
-		$data_1= DB::table('tb_users')->select('id','name','groupID','gender','email','image','description','created_at','updated_at')->where('id',$id)->get();
+		$data_1= DB::table('tb_users')->leftjoin('tb_group', 'tb_users.groupID', '=' , 'tb_group.groupID')
+									  ->select('id','name','tb_users.groupID','gender','email','image','description','created_at','updated_at','tb_group.groupName')
+									  ->where('id',$id)->get();
 		if (count($data_1))
 		{
 			return response()->json([
