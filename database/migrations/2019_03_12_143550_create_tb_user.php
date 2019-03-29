@@ -20,11 +20,11 @@ class CreateTbUser extends Migration
             $table->boolean('gender')->nullable();
             $table->string('email')->unique();
             $table->string('password');
+            $table->char('api_token', 60)->nullable();
             $table->string('image')->nullable();
             $table->text('description')->nullable();
-            $table->timestamps('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->timestamps('deleted_at')->nullable();
             $table->softDeletes();
+            
         });
     }
 
@@ -38,3 +38,4 @@ class CreateTbUser extends Migration
         Schema::dropIfExists('tb_user');
     }
 }
+    

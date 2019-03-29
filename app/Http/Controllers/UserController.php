@@ -9,7 +9,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use DB;
 use Validator;
-use App\Http\TbUser;
+use App\TbUser;
 use App\Imports\UsersImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\URL;
@@ -173,7 +173,8 @@ class UserController extends Controller
 			[
 				'password' => 'min:3|max:20',
 				'name' => 'max:20',
-				'gender'=>'',
+				'gender'=>'boolean|max:1',
+				'groupID' =>'integer|max:20',
 				'image'=>'image',
 				'description'=>'max:255',
 			],
@@ -181,6 +182,7 @@ class UserController extends Controller
 			[
 				'min' => ':attribute không được nhỏ hơn :min ký tự',
 				'max' => ':attribute không được lớn hơn :max ký tự',
+				'integer' => 'Must be an integer',
 				'boolean'=>'chỉ cho phép nhập 2 giá trị 0 hoặc 1',
 			],
 		);	
@@ -275,7 +277,7 @@ class UserController extends Controller
 			$data_1= DB::table('tb_users')->where('id',$id)->get();
 			if (count($data_1))
 			{
-				DB::table('tb_users')->where('id',$id)->delete();
+				TbUser::find($id)->delete();
 				return response()->json([
 					'status'=> 204,
 					'message'=> 'Deleted record',
@@ -300,37 +302,36 @@ class UserController extends Controller
 	public function listUser(Request $request)
 	{
 
-		$all_user = DB::table('tb_users')->get();
+		$all_user = DB::table('tb_users')->whereNull('deleted_at')->get();
 		$total_user = count($all_user);
-		$page = $_GET['page'];
-		$page_size = $_GET['pageSize'];
+		$page = request()->page;
+		$page_size = request()->pageSize;
 		$sort = $_GET['sort'];
 		if ($page_size == "")
 		{	
 			$page_size=$total_user;
-
 		}
 		if ($page == "")
 		{
 			$page = 1;
 		}
-
 		$start_index = ($page - 1) * $page_size;
-		$end_index = $start_index + $page_size - 1; 
 		$query = $_GET['query'];
 		if ($sort == null) 
 		{
-			$data = DB::table('tb_users')->leftjoin('tb_group', 'tb_users.groupID', '=' , 'tb_group.groupID')
-										 ->select('id','name','email','gender','description','image','tb_users.groupID','tb_group.groupID','tb_group.groupName')
-										 ->where('name', 'LIKE', "%{$query}%")
-										 ->orWhere('email', 'LIKE', "%{$query}%")->get()->toArray();
+			$data = TbUser::leftjoin('tb_group', 'tb_users.groupID', '=' , 'tb_group.groupID')
+							->select('id','name','email','gender','description','image','tb_users.groupID','tb_group.groupID','tb_group.groupName') 
+							->where('name', 'LIKE', "%{$query}%")
+							->orWhere('email', 'LIKE', "%{$query}%")  	
+							->get()->toArray();
 		}
 		else
 		{
-			$data = DB::table('tb_users')->leftjoin('tb_group', 'tb_users.groupID', '=' , 'tb_group.groupID')
-										 ->select('id','name','email','gender','description','image','tb_users.groupID','tb_group.groupID','tb_group.groupName')
-										 ->where('name', 'LIKE', "%{$query}%")
-										 ->orWhere('email', 'LIKE', "%{$query}%")->orderBy('tb_users.groupID', $sort)->get()->toArray();
+			$data = TbUser::leftjoin('tb_group', 'tb_users.groupID', '=' , 'tb_group.groupID')
+							->select('id','name','email','gender','description','image','tb_users.groupID','tb_group.groupID','tb_group.groupName')
+							->where('name', 'LIKE', "%{$query}%")
+							->orWhere('email', 'LIKE', "%{$query}%")
+							->orderBy('tb_users.groupID', $sort)->get()->toArray();
 		}
 		 $data = array_slice($data, $start_index , $page_size);
 		//dd(array_slice($data, 1));

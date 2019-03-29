@@ -19,7 +19,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::group(['middleware' => ['CheckToken']], function () {
-    Route::post('/users', 'UserController@store');
 	Route::put('/users/{id}', 'UserController@update');
 	Route::delete('/users/{id}', 'UserController@destroy');
 	Route::get('/users', 'UserController@listUser')->middleware('CheckToken');
@@ -32,4 +31,5 @@ Route::group(['middleware' => ['CheckToken']], function () {
 });
 Route::post('/login', 'UserController@login');
 Route::post('/logout', 'UserController@logout');
+Route::post('/users', 'UserController@store');
 
