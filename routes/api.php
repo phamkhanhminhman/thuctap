@@ -28,6 +28,7 @@ Route::group(['middleware' => ['CheckToken']], function () {
 	Route::post('/search', 'UserController@search');
 	Route::post('/import', 'UserController@importExcel');	
 	Route::put('/users', 'UserController@changePassword');
+	Route::get('/group', 'UserController@listGroup');
 });
 Route::post('/login', 'UserController@login');
 Route::post('/logout', 'UserController@logout');

@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use DB;
 use Validator;
+use App\Http\TbUser;
 use App\Imports\UsersImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\URL;
@@ -299,65 +300,65 @@ class UserController extends Controller
 	public function listUser(Request $request)
 	{
 
-			$all_user = DB::table('tb_users')->get();
-			$total_user = count($all_user);
-			$page = $_GET['page'];
-			$page_size = $_GET['pageSize'];
-			$sort = $_GET['sort'];
-			if ($page_size == "")
-			{	
-				$page_size=$total_user;
+		$all_user = DB::table('tb_users')->get();
+		$total_user = count($all_user);
+		$page = $_GET['page'];
+		$page_size = $_GET['pageSize'];
+		$sort = $_GET['sort'];
+		if ($page_size == "")
+		{	
+			$page_size=$total_user;
 
-			}
-			if ($page == "")
-			{
-				$page = 1;
-			}
+		}
+		if ($page == "")
+		{
+			$page = 1;
+		}
 
-			$start_index = ($page - 1) * $page_size;
-			$end_index = $start_index + $page_size - 1; 
-			$query = $_GET['query'];
-			if ($sort == null) 
-			{
-				$data = DB::table('tb_users')->leftjoin('tb_group', 'tb_users.groupID', '=' , 'tb_group.groupID')
-											 ->select('id','name','email','gender','description','image','tb_users.groupID','tb_group.groupID','tb_group.groupName')
-											 ->where('name', 'LIKE', "%{$query}%")
-											 ->orWhere('email', 'LIKE', "%{$query}%")->get()->toArray();
-			}
-			else
-			{
-				$data = DB::table('tb_users')->leftjoin('tb_group', 'tb_users.groupID', '=' , 'tb_group.groupID')
-											 ->select('id','name','email','gender','description','image','tb_users.groupID','tb_group.groupID','tb_group.groupName')
-											 ->where('name', 'LIKE', "%{$query}%")
-											 ->orWhere('email', 'LIKE', "%{$query}%")->orderBy('tb_users.groupID', $sort)->get()->toArray();
-			}
-			 $data = array_slice($data, $start_index , $page_size);
-			//dd(array_slice($data, 1));
-			return response()->json([
-				'status'=> 200,
-				'message'=>'Dữ liệu trả về thành công',
-				'data'=>$data,
-				'length'=>$total_user,
-			]);	
+		$start_index = ($page - 1) * $page_size;
+		$end_index = $start_index + $page_size - 1; 
+		$query = $_GET['query'];
+		if ($sort == null) 
+		{
+			$data = DB::table('tb_users')->leftjoin('tb_group', 'tb_users.groupID', '=' , 'tb_group.groupID')
+										 ->select('id','name','email','gender','description','image','tb_users.groupID','tb_group.groupID','tb_group.groupName')
+										 ->where('name', 'LIKE', "%{$query}%")
+										 ->orWhere('email', 'LIKE', "%{$query}%")->get()->toArray();
+		}
+		else
+		{
+			$data = DB::table('tb_users')->leftjoin('tb_group', 'tb_users.groupID', '=' , 'tb_group.groupID')
+										 ->select('id','name','email','gender','description','image','tb_users.groupID','tb_group.groupID','tb_group.groupName')
+										 ->where('name', 'LIKE', "%{$query}%")
+										 ->orWhere('email', 'LIKE', "%{$query}%")->orderBy('tb_users.groupID', $sort)->get()->toArray();
+		}
+		 $data = array_slice($data, $start_index , $page_size);
+		//dd(array_slice($data, 1));
+		return response()->json([
+			'status'=> 200,
+			'message'=>'Dữ liệu trả về thành công',
+			'data'=>$data,
+			'length'=>$total_user,
+		]);	
 	}
 	public function detailUser(Request $request, $id)
 	{
-			$data_1= DB::table('tb_users')->select('id','name','groupID','gender','email','image','description','created_at','updated_at')->where('id',$id)->get();
-			if (count($data_1))
-			{
-				return response()->json([
-					'status' => 200,
-					'message' =>'Dữ liệu chi tiết user trả về thành công',
-					'data' => $data_1,
-				]);
-			}
-			else
-			{
-				return response()->json([
-					'status' => 204,
-					'message'=>"Không có dữ liệu trả về",
-				]);
-			}	
+		$data_1= DB::table('tb_users')->select('id','name','groupID','gender','email','image','description','created_at','updated_at')->where('id',$id)->get();
+		if (count($data_1))
+		{
+			return response()->json([
+				'status' => 200,
+				'message' =>'Dữ liệu chi tiết user trả về thành công',
+				'data' => $data_1,
+			]);
+		}
+		else
+		{
+			return response()->json([
+				'status' => 204,
+				'message'=>"Không có dữ liệu trả về",
+			]);
+		}	
 	}
 	public function importExcel(Request $request)
 	{
@@ -442,5 +443,15 @@ class UserController extends Controller
 				'message'=>'Must be login',
 			]);
 		}
+	}
+	public function listGroup() 
+	{
+		$data = DB::table('tb_group')->select('groupID','groupName')->get();
+		return response()->json([
+				'status' => 200,
+				'message' =>'Dữ liệu group trả về thành công',
+				'data' => $data,
+			]); 
+
 	}
 }

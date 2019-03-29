@@ -23,8 +23,8 @@ class CreateTbUser extends Migration
             $table->string('image')->nullable();
             $table->text('description')->nullable();
             $table->timestamps('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->timestamps('deleted_at');
-            $table->
+            $table->timestamps('deleted_at')->nullable();
+            $table->softDeletes();
         });
     }
 
