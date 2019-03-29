@@ -298,9 +298,7 @@ class UserController extends Controller
 	}
 	public function listUser(Request $request)
 	{
-		$data= DB::table('tb_users')->where('api_token',$request->header('token'))->get();
-		if (count($data)==1)
-		{	
+
 			$all_user = DB::table('tb_users')->get();
 			$total_user = count($all_user);
 			$page = $_GET['page'];
@@ -322,14 +320,14 @@ class UserController extends Controller
 			if ($sort == null) 
 			{
 				$data = DB::table('tb_users')->leftjoin('tb_group', 'tb_users.groupID', '=' , 'tb_group.groupID')
-											 ->select('*')
+											 ->select('id','name','email','gender','description','image','tb_users.groupID','tb_group.groupID','tb_group.groupName')
 											 ->where('name', 'LIKE', "%{$query}%")
 											 ->orWhere('email', 'LIKE', "%{$query}%")->get()->toArray();
 			}
 			else
 			{
 				$data = DB::table('tb_users')->leftjoin('tb_group', 'tb_users.groupID', '=' , 'tb_group.groupID')
-											 ->select('*')
+											 ->select('id','name','email','gender','description','image','tb_users.groupID','tb_group.groupID','tb_group.groupName')
 											 ->where('name', 'LIKE', "%{$query}%")
 											 ->orWhere('email', 'LIKE', "%{$query}%")->orderBy('tb_users.groupID', $sort)->get()->toArray();
 			}
@@ -340,21 +338,10 @@ class UserController extends Controller
 				'message'=>'Dữ liệu trả về thành công',
 				'data'=>$data,
 				'length'=>$total_user,
-			]);
-		}
-		else
-		{
-			return response()->json([
-				'status'=> 204,
-				'message'=> 'Must be login',
-			]);
-		}		
+			]);	
 	}
 	public function detailUser(Request $request, $id)
 	{
-		$data= DB::table('tb_users')->where('api_token',$request->header('token'))->get();
-		if (count($data)==1)
-		{
 			$data_1= DB::table('tb_users')->select('id','name','groupID','gender','email','image','description','created_at','updated_at')->where('id',$id)->get();
 			if (count($data_1))
 			{
@@ -371,14 +358,6 @@ class UserController extends Controller
 					'message'=>"Không có dữ liệu trả về",
 				]);
 			}	
-		}
-		else
-		{
-			return response()->json([
-				'status' => 204,
-				'message'=> 'Must be login',
-			]);
-		}
 	}
 	public function importExcel(Request $request)
 	{

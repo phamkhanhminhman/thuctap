@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use DB;
 
 class CheckToken
 {
@@ -15,13 +16,17 @@ class CheckToken
      */
     public function handle($request, Closure $next)
     {
-        if ($request->headers->has('token'))
+        $data= DB::table('tb_users')->where('api_token',$request->header('token'))->get();
+        if (count($data) == 1)
         {
             return $next($request);
         }
         else
         {
-            return redirect('/');
+            return response()->json([
+                    'status' => 204,
+                    'message'=>"Must be login",
+                ]);
         }
         
     }
