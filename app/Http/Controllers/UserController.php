@@ -22,6 +22,7 @@ class UserController extends Controller
 			[
 				'email' => 'required|max:255|email',
 				'password' => 'required',
+				'captcha' => 'required'
 			],
 			[
 				'required' => ':attribute không được để trống',
@@ -39,26 +40,51 @@ class UserController extends Controller
 		}
 		else
 		{
-			$email= $request->email;
-			$password= $request->password;
-			$password= md5($password);
-			$token=str_random(60);	
-			$data= DB::table('tb_users')->where([['email', $email],['password', $password]])->get();
-			if (count($data))
+			$api_url= 'https://www.google.com/recaptcha/api/siteverify';
+			$captcha_response = $request->captcha;
+			$secret_key= '6LcnQJsUAAAAAC-kkl3h0C_33yGyNpKkd1N_Qgwe';
+			$curl = curl_init();
+			curl_setopt_array($curl, array(
+			    CURLOPT_RETURNTRANSFER => 1,
+			    CURLOPT_URL => 'https://www.google.com/recaptcha/api/siteverify?secret='.$secret_key.'&response='.$captcha_response,
+			    CURLOPT_USERAGENT => 'aaa',
+			    CURLOPT_SSL_VERIFYPEER => false, //Bỏ kiểm SSL
+
+			));
+			$resp = curl_exec($curl);
+			curl_close($curl);
+			$resp = json_decode($resp); 
+			
+			if($resp->success == true) 
 			{
-				DB::table('tb_users')->where([['email', $email],['password', $password]])->update(['api_token'=>$token]);
-				$data= DB::table('tb_users')->select('id','name','gender','email','api_token','image','description')->where([['email', $email],['password', $password]])->get();
-				return response()->json([
-					'status'=> 200,
-					'message'=> 'Login thành công',
-					'data'=>$data,
-				]);
+				$email= $request->email;
+				$password= $request->password;
+				$password= md5($password);	
+				$token=str_random(60);	
+				$data= DB::table('tb_users')->where([['email', $email],['password', $password]])->get();
+				if (count($data))
+				{
+					DB::table('tb_users')->where([['email', $email],['password', $password]])->update(['api_token'=>$token]);
+					$data= DB::table('tb_users')->select('id','name','gender','email','api_token','image','description')->where([['email', $email],['password', $password]])->get();
+					return response()->json([
+						'status'=> 200,
+						'message'=> 'Login thành công',
+						'data'=>$data,
+					]);
+				}
+				else
+				{
+					return response()->json([
+						'status'=> 403,
+						'message'=> 'Đăng nhập không thành công. Sai email hoặc password',
+					]);
+				}
 			}
 			else
 			{
 				return response()->json([
 					'status'=> 403,
-					'message'=> 'Đăng nhập không thành công. Sai email hoặc password',
+					'message'=> 'Failed',
 				]);
 			}
 		}
@@ -371,16 +397,14 @@ class UserController extends Controller
 	{
 		$token= $request->header('token');
 		$file= $request->file('excel');
-		$data= DB::table('tb_users')->where('api_token',$token)->get();
-		if (count($data)==1)
-		{
+
 			if ($request->has('excel'))
 			{
 				$type_file=$file->getClientOriginalExtension();
 				if ($type_file=='xlsx' || $type_file=='csv')
 				{
 					Excel::import(new UsersImport, request()->file('excel'));
-					$data_new = DB::table('tb_users')->select('*')->get();
+					//$data_new = DB::table('tb_users')->select('*')->get();
 					return response()->json([
 						'status' => 200,
 						'message'=>'Imported file excel successfully',
@@ -401,14 +425,6 @@ class UserController extends Controller
 					'message'=>'nothing',
 				]);
 			}
-		}
-		else
-		{
-			return response()->json([
-				'status' => 200,
-				'message'=> 'Must be login',
-			]);
-		}	
 	}
 	public function changePassword(Request $request)
 	{	
