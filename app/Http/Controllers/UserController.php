@@ -125,7 +125,7 @@ class UserController extends Controller
 			{
 				if ($request->has('image'))
 				{
-					$img= "http://127.0.0.1:8000/upload/".$file->getClientOriginalName();
+					$img= "http://127.0.0.1:1111/upload/".$file->getClientOriginalName();
 					$file->move('./upload/',$file->getClientOriginalName());
 					DB::table('tb_users')->insert(
 						[
@@ -231,9 +231,25 @@ class UserController extends Controller
 				{
 					$groupID=$groupID_old;
 				}
-				if ($token)
+				if ($request->has('image'))
 				{
-				//$img= "".$file->getClientOriginalName();
+					$img= "http://127.0.0.1:8000/upload/".$file->getClientOriginalName();
+					DB::table('tb_users')->where('id',$id)->update(
+						[
+							'name'=>$name,
+							'gender'=>$gender,
+							'groupID'=>$groupID,
+							'description'=>$description,
+							'image'=>$img,
+
+						]);
+					return response()->json([
+						'status' => 200,
+						'message'=> 'Cập nhật thành công',
+					]);			
+				}
+				else
+				{
 					DB::table('tb_users')->where('id',$id)->update(
 						[
 							'name'=>$name,
@@ -245,14 +261,7 @@ class UserController extends Controller
 					return response()->json([
 						'status' => 200,
 						'message'=> 'Cập nhật thành công',
-					]);			
-				}
-				else
-				{
-					return response()->json([
-						'status' => 403,
-						'message'=> 'Not allowed',
-					]);	
+					]);;	
 				}
 			}
 			else
@@ -315,7 +324,7 @@ class UserController extends Controller
 		if ($sort == null) 
 		{
 			$data = TbUser::leftjoin('tb_group', 'tb_users.groupID', '=' , 'tb_group.groupID')
-							->select('id','name','email','gender','description','image','tb_users.groupID','tb_group.groupID','tb_group.groupName') 
+							->select('id','name','email','gender','dob','description','image','tb_users.groupID','tb_group.groupID','tb_group.groupName') 
 							->where('name', 'LIKE', "%{$query}%")
 							->orWhere('email', 'LIKE', "%{$query}%")  	
 							->get()->toArray();
@@ -323,7 +332,7 @@ class UserController extends Controller
 		else
 		{
 			$data = TbUser::leftjoin('tb_group', 'tb_users.groupID', '=' , 'tb_group.groupID')
-							->select('id','name','email','gender','description','image','tb_users.groupID','tb_group.groupID','tb_group.groupName')
+							->select('id','name','email','gender','dob','description','image','tb_users.groupID','tb_group.groupID','tb_group.groupName')
 							->where('name', 'LIKE', "%{$query}%")
 							->orWhere('email', 'LIKE', "%{$query}%")
 							->orderBy('tb_users.groupID', $sort)->get()->toArray();
@@ -375,7 +384,6 @@ class UserController extends Controller
 					return response()->json([
 						'status' => 200,
 						'message'=>'Imported file excel successfully',
-						'data' => $data_new,
 					]);
 				}
 				else

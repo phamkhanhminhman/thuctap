@@ -17,6 +17,9 @@ class CreateTbUser extends Migration
             $table->bigIncrements('id');
             $table->string('groupID');
             $table->string('name');
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->times('dob');
             $table->boolean('gender')->nullable();
             $table->string('email')->unique();
             $table->string('password');

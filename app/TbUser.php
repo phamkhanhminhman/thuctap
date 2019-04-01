@@ -10,7 +10,7 @@ class TbUser extends Model
 	use SoftDeletes;
     protected $table="tb_users";
     protected $fillable = [
-        'name', 'gender','email','password','email','description'
+        'name','dob','first_name','last_name','groupID','gender','email','password','email','description','image'
     ];
     protected $dates = ['deleted_at'];
 }
