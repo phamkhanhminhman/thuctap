@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use DB;
 use Validator;
+use Config;
 use App\TbUser;
 use App\Imports\UsersImport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -40,13 +41,13 @@ class UserController extends Controller
 		}
 		else
 		{
-			$api_url= 'https://www.google.com/recaptcha/api/siteverify';
+			$api_url= config('var.url_captcha');
 			$captcha_response = $request->captcha;
-			$secret_key= '6LcnQJsUAAAAAC-kkl3h0C_33yGyNpKkd1N_Qgwe';
+			$secret_key= config('var.google_secret');
 			$curl = curl_init();
 			curl_setopt_array($curl, array(
 			    CURLOPT_RETURNTRANSFER => 1,
-			    CURLOPT_URL => 'https://www.google.com/recaptcha/api/siteverify?secret='.$secret_key.'&response='.$captcha_response,
+			    CURLOPT_URL => config('var.secret').$secret_key.'&response='.$captcha_response,
 			    CURLOPT_USERAGENT => 'aaa',
 			    CURLOPT_SSL_VERIFYPEER => false, //Bỏ kiểm SSL
 
