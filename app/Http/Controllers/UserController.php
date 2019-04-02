@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use DB;
 use Validator;
 use Config;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Client;
 use App\TbUser;
 use App\Imports\UsersImport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -56,6 +58,11 @@ class UserController extends Controller
 			curl_close($curl);
 			$resp = json_decode($resp); 
 			
+			// $client = new Client();
+   //     		$response = $client->request('get', 'https://www.google.com/recaptcha/api/siteverify?secret='.$secret_key.'&response='.$captcha_response);
+   //      	$response = json_decode($response->getBody()->getContents());
+
+
 			if($resp->success == true) 
 			{
 				$email= $request->email;
