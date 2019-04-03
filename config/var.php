@@ -6,6 +6,6 @@ return [
 
    'url_captcha' => env('URL_CAPTCHA', 'URL'),
 
-   'secret' => 'https://www.google.com/recaptcha/api/siteverify?secret=',
+   'url_secret' => 'https://www.google.com/recaptcha/api/siteverify?secret=',
 
 ];

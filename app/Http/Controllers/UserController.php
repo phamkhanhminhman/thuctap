@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use DB;
 use Validator;
 use Config;
+use App\utils\Captcha;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Client;
 use App\TbUser;
@@ -43,26 +44,9 @@ class UserController extends Controller
 		}
 		else
 		{
-			$api_url= config('var.url_captcha');
 			$captcha_response = $request->captcha;
-			$secret_key= config('var.google_secret');
-			$curl = curl_init();
-			curl_setopt_array($curl, array(
-			    CURLOPT_RETURNTRANSFER => 1,
-			    CURLOPT_URL => config('var.secret').$secret_key.'&response='.$captcha_response,
-			    CURLOPT_USERAGENT => 'aaa',
-			    CURLOPT_SSL_VERIFYPEER => false, //Bỏ kiểm SSL
-
-			));
-			$resp = curl_exec($curl);
-			curl_close($curl);
-			$resp = json_decode($resp); 
-			
-			// $client = new Client();
-   //     		$response = $client->request('get', 'https://www.google.com/recaptcha/api/siteverify?secret='.$secret_key.'&response='.$captcha_response);
-   //      	$response = json_decode($response->getBody()->getContents());
-
-
+			$url = config('var.url_secret').config('var.google_secret').'&response='.$captcha_response;
+			$resp= Captcha::recaptcha($url);
 			if($resp->success == true) 
 			{
 				$email= $request->email;
