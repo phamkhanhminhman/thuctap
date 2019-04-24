@@ -23,4 +23,5 @@ DB_DATABASE=baitap
 DB_USERNAME=root
 DB_PASSWORD=
 
-
+port = 1111
+angular 7
